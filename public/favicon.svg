@@ -1,0 +1,15 @@
+<svg width="64" height="64" viewBox="0 0 1200 1200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="1200" fill="#FFFFFF" rx="160" />
+  <defs>
+    <clipPath id="frame"><rect x="80" y="180" width="1040" height="850" /></clipPath>
+  </defs>
+  <g clip-path="url(#frame)">
+    <g fill="none" stroke="#F93822" stroke-width="135" stroke-linejoin="miter" stroke-miterlimit="2">
+      <polyline points="245,140 405,640 550,310 705,680 767,140" />
+      <polyline points="510,1080 672,600 790,930 908,600 1020,1080" stroke-miterlimit="1.2" />
+    </g>
+    <polygon points="864,295 784,515 944,515" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="95" stroke-linejoin="miter" stroke-miterlimit="8" />
+    <polygon points="864,295 784,515 944,515" fill="#F93822" />
+    <polygon points="864,420 828,515 900,515" fill="#FFFFFF" />
+  </g>
+</svg>

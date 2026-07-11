@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-wam-bg font-body text-wam-ink antialiased;
+}
+
+/* Números alinhados apenas em colunas de tabela e eixos */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
