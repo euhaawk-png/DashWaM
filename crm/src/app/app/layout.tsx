@@ -25,7 +25,17 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         roleLabel={{ owner: "Dono", manager: "Gerente", seller: "Vendedor" }[ctx.role]}
         logoutAction={logoutAction}
       />
-      <main className="flex-1 overflow-y-auto bg-gray-50/60">{children}</main>
+      <main className="flex flex-1 flex-col overflow-y-auto bg-gray-50/60">
+        {ctx.role === "owner" && !ctx.tenant.settings.onboardingDone && (
+          <a
+            href="/app/onboarding"
+            className="block shrink-0 bg-accent px-4 py-2 text-center text-sm font-medium text-white hover:bg-accent/90"
+          >
+            Complete a configuração da sua conta — conecte o WhatsApp e convide o time →
+          </a>
+        )}
+        <div className="min-h-0 flex-1">{children}</div>
+      </main>
     </div>
   );
 }

@@ -100,11 +100,11 @@ describeDb("RLS tenant isolation", () => {
     // Depending on the role, the write is either rejected (REVOKE on crm_app)
     // or filtered to zero rows (no UPDATE/DELETE policy). Both must leave the
     // entry intact.
-    await asTenant(tenantA, (tx) =>
-      tx`UPDATE activity_log SET action = 'x' WHERE id = ${entry.id}`.catch(() => undefined)
+    await asTenant(tenantA, (tx) => tx`UPDATE activity_log SET action = 'x' WHERE id = ${entry.id}`).catch(
+      () => undefined
     );
-    await asTenant(tenantA, (tx) =>
-      tx`DELETE FROM activity_log WHERE id = ${entry.id}`.catch(() => undefined)
+    await asTenant(tenantA, (tx) => tx`DELETE FROM activity_log WHERE id = ${entry.id}`).catch(
+      () => undefined
     );
     const rows = await asTenant(tenantA, (tx) => tx`SELECT action FROM activity_log WHERE id = ${entry.id}`);
     expect(rows).toHaveLength(1);

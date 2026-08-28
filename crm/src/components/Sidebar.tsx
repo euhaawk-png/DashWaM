@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { brand } from "@/config/brand";
+import { NotificationsBell } from "./NotificationsBell";
 
 const ICONS: Record<string, React.ReactNode> = {
   inbox: (
@@ -80,6 +81,9 @@ export function Sidebar({
         })}
       </nav>
       <div className="border-t border-line p-3">
+        <div className="mb-1">
+          <NotificationsBell collapsed={collapsed} />
+        </div>
         {!collapsed && (
           <div className="mb-2 px-1">
             <div className="truncate text-sm font-medium">{userName}</div>
