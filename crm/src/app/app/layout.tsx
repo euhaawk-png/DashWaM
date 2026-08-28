@@ -10,12 +10,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     { href: "/app/inbox", label: "Inbox", icon: "inbox" },
     { href: "/app/pipeline", label: "Pipeline", icon: "kanban" },
     { href: "/app/contatos", label: "Contatos", icon: "users" },
-    ...(isManager
-      ? [
-          { href: "/app/formularios", label: "Formulários", icon: "form" },
-          { href: "/app/integracoes", label: "Integrações", icon: "plug" },
-        ]
-      : []),
+    ...(isManager ? [{ href: "/app/formularios", label: "Formulários", icon: "form" }] : []),
+    ...(ctx.role === "owner" ? [{ href: "/app/integracoes", label: "Integrações", icon: "plug" }] : []),
     { href: "/app/relatorios", label: "Relatórios", icon: "chart" },
     { href: "/app/configuracoes", label: "Configurações", icon: "gear" },
   ];
