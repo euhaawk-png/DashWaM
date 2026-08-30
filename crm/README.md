@@ -91,8 +91,12 @@ cruzada), que sem contexto de tenant nenhuma linha aparece, e que o audit log é
 \* Meta Lead Ads fica atrás da flag `META_LEADGEN_ENABLED` até a aprovação de
 `leads_retrieval` no App Review.
 
-## Deploy (Vercel)
+## Deploy (Vercel + Supabase)
 
+0. **Banco (Supabase)**: cole o conteúdo de [`supabase-setup.sql`](./supabase-setup.sql) no
+   SQL Editor e execute — ele aplica schema + RLS, cria o papel `crm_app` com senha, registra
+   as migrações e roda o seed. É idempotente. A `DATABASE_URL` de produção autentica como
+   `crm_app.<project-ref>` no transaction pooler (porta 6543).
 1. Importe o repositório com **Root Directory = `crm`**.
 2. Configure as variáveis do `.env.example` (produção: `APP_URL` público HTTPS).
 3. O cron de `vercel.json` chama `/api/jobs/run` a cada minuto (a Vercel envia
