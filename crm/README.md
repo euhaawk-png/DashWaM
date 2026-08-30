@@ -28,6 +28,23 @@ Usuários do seed (senha `Trocar-esta-senha-123`, ou defina `SEED_PASSWORD`):
 `admin@plataforma.local` (super admin → /admin), `dono@demo.local`, `gerente@demo.local`,
 `vendedor@demo.local`.
 
+### Variáveis de ambiente
+
+| Variável | Localhost | Produção | Para quê |
+| --- | --- | --- | --- |
+| `DATABASE_URL` | obrigatória | obrigatória | Conexão da aplicação (papel `crm_app`, sem BYPASSRLS) |
+| `DATABASE_ADMIN_URL` | obrigatória | obrigatória (só CI/deploy) | Migrações e seed (owner do schema) |
+| `APP_URL` | obrigatória | obrigatória | Links de e-mail, URLs públicas, checagem de origin |
+| `ENCRYPTION_KEY` | obrigatória | obrigatória | AES-256-GCM dos tokens Meta e chaves de webhook |
+| `CRON_SECRET` | obrigatória | obrigatória | Protege `/api/jobs/run` |
+| `META_APP_ID` / `META_APP_SECRET` | opcionais (WhatsApp desativado sem elas) | obrigatórias | Embedded Signup + assinatura dos webhooks |
+| `META_ES_CONFIG_ID` | opcional | obrigatória | Config do Embedded Signup v4 |
+| `META_WEBHOOK_VERIFY_TOKEN` | opcional | obrigatória | Handshake GET dos webhooks da Meta |
+| `META_GRAPH_VERSION` | opcional (padrão v23.0) | opcional | Versão da Graph API |
+| `META_LEADGEN_ENABLED` | opcional (padrão false) | opcional | Feature flag do conector Meta Lead Ads |
+| `RESEND_API_KEY` / `EMAIL_FROM` | opcionais (e-mails vão para o console) | obrigatórias | E-mail transacional |
+| `SEED_PASSWORD` | opcional | não usar seed em produção | Senha dos usuários do seed |
+
 > **Importante:** `DATABASE_URL` deve apontar para o papel `crm_app` (criado pela migração
 > `0001_rls.sql`, **sem** BYPASSRLS). Defina a senha dele: `ALTER ROLE crm_app PASSWORD '...'`.
 > `DATABASE_ADMIN_URL` (owner do schema) é usada só por migração/seed.
