@@ -10,6 +10,7 @@ export default async function SettingsLayout({ children }: { children: React.Rea
     ...(isOwner ? [{ href: "/app/configuracoes", label: "Empresa" }] : []),
     ...(isOwner ? [{ href: "/app/configuracoes/whatsapp", label: "WhatsApp" }] : []),
     ...(isOwner ? [{ href: "/app/configuracoes/equipe", label: "Equipe" }] : []),
+    ...(isOwner ? [{ href: "/app/configuracoes/funil", label: "Funil" }] : []),
     ...(isManager ? [{ href: "/app/configuracoes/respostas-rapidas", label: "Respostas rápidas" }] : []),
     ...(isManager ? [{ href: "/app/configuracoes/distribuicao", label: "Distribuição" }] : []),
     { href: "/app/configuracoes/seguranca", label: "Minha segurança" },

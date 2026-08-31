@@ -3,11 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
-import { db, withTenant } from "@/db";
+import { db, withTenant, type Tx } from "@/db";
 import {
+  deals,
   leadRoutingRules,
   memberships,
+  pipelines,
   quickReplies,
+  stages,
   tenants,
   users,
   waTemplates,
@@ -218,6 +221,167 @@ export async function deleteRoutingRuleAction(formData: FormData): Promise<void>
   const id = z.string().uuid().parse(formData.get("id"));
   await withTenant(ctx.tenant.id, (tx) => tx.delete(leadRoutingRules).where(eq(leadRoutingRules.id, id)));
   revalidatePath("/app/configuracoes/distribuicao");
+}
+
+// -------------------------------------------------------------- funnel -----
+
+async function defaultPipelineStages(tx: Tx, tenantId: string) {
+  const pipeline = (
+    await tx
+      .select()
+      .from(pipelines)
+      .where(and(eq(pipelines.tenantId, tenantId), eq(pipelines.isDefault, true)))
+      .limit(1)
+  )[0];
+  if (!pipeline) return null;
+  const rows = await tx.select().from(stages).where(eq(stages.pipelineId, pipeline.id));
+  rows.sort((a, b) => a.position - b.position);
+  return { pipeline, rows };
+}
+
+export async function renameStageAction(formData: FormData): Promise<void> {
+  const ctx = await requireRole("owner");
+  const parsed = z
+    .object({ stageId: z.string().uuid(), name: z.string().min(1).max(60) })
+    .parse({ stageId: formData.get("stageId"), name: formData.get("name") });
+  await withTenant(
+    ctx.tenant.id,
+    async (tx) => {
+      await tx
+        .update(stages)
+        .set({ name: parsed.name.trim() })
+        .where(and(eq(stages.tenantId, ctx.tenant.id), eq(stages.id, parsed.stageId)));
+      await audit(tx, {
+        tenantId: ctx.tenant.id,
+        userId: ctx.user.id,
+        action: "stage_rename",
+        entity: "stage",
+        entityId: parsed.stageId,
+        data: { name: parsed.name },
+      });
+    },
+    { userId: ctx.user.id }
+  );
+  revalidatePath("/app/configuracoes/funil");
+}
+
+export async function createStageAction(
+  _prev: SettingsActionState,
+  formData: FormData
+): Promise<SettingsActionState> {
+  const ctx = await requireRole("owner");
+  const parsed = z.object({ name: z.string().min(1).max(60) }).safeParse({ name: formData.get("name") });
+  if (!parsed.success) return { error: "Informe o nome da etapa." };
+  const result = await withTenant(
+    ctx.tenant.id,
+    async (tx) => {
+      const data = await defaultPipelineStages(tx, ctx.tenant.id);
+      if (!data) return { error: "Nenhum funil padrão encontrado." };
+      // New open stages enter right before Ganhou/Perdeu.
+      const open = data.rows.filter((s) => s.kind === "open");
+      if (open.length >= 10) return { error: "Limite de 10 etapas abertas atingido." };
+      const position = open.length > 0 ? open[open.length - 1].position + 1 : 0;
+      // Shift the won/lost stages one slot to the right.
+      for (const s of data.rows.filter((s) => s.position >= position)) {
+        await tx.update(stages).set({ position: s.position + 1 }).where(eq(stages.id, s.id));
+      }
+      const [created] = await tx
+        .insert(stages)
+        .values({
+          tenantId: ctx.tenant.id,
+          pipelineId: data.pipeline.id,
+          name: parsed.data.name.trim(),
+          kind: "open",
+          position,
+        })
+        .returning();
+      await audit(tx, {
+        tenantId: ctx.tenant.id,
+        userId: ctx.user.id,
+        action: "stage_create",
+        entity: "stage",
+        entityId: created.id,
+        data: { name: created.name },
+      });
+      return { ok: true as const };
+    },
+    { userId: ctx.user.id }
+  );
+  revalidatePath("/app/configuracoes/funil");
+  return "error" in result && result.error ? { error: result.error } : { ok: true, message: "Etapa criada." };
+}
+
+export async function deleteStageAction(
+  _prev: SettingsActionState,
+  formData: FormData
+): Promise<SettingsActionState> {
+  const ctx = await requireRole("owner");
+  const stageId = z.string().uuid().parse(formData.get("stageId"));
+  const result = await withTenant(
+    ctx.tenant.id,
+    async (tx) => {
+      const stage = (
+        await tx
+          .select()
+          .from(stages)
+          .where(and(eq(stages.tenantId, ctx.tenant.id), eq(stages.id, stageId)))
+          .limit(1)
+      )[0];
+      if (!stage) return { error: "Etapa não encontrada." };
+      if (stage.kind !== "open") {
+        return { error: "As etapas Ganhou/Perdeu não podem ser excluídas — elas alimentam os relatórios." };
+      }
+      const data = await defaultPipelineStages(tx, ctx.tenant.id);
+      if (!data || data.rows.filter((s) => s.kind === "open").length <= 1) {
+        return { error: "O funil precisa de pelo menos uma etapa aberta." };
+      }
+      const inUse = await tx
+        .select({ id: deals.id })
+        .from(deals)
+        .where(and(eq(deals.tenantId, ctx.tenant.id), eq(deals.stageId, stageId)))
+        .limit(1);
+      if (inUse.length > 0) {
+        return { error: "Há negociações nesta etapa. Mova-as antes de excluir." };
+      }
+      await tx.delete(stages).where(eq(stages.id, stageId));
+      await audit(tx, {
+        tenantId: ctx.tenant.id,
+        userId: ctx.user.id,
+        action: "stage_delete",
+        entity: "stage",
+        entityId: stageId,
+        data: { name: stage.name },
+      });
+      return { ok: true as const };
+    },
+    { userId: ctx.user.id }
+  );
+  revalidatePath("/app/configuracoes/funil");
+  return "error" in result && result.error ? { error: result.error } : { ok: true, message: "Etapa excluída." };
+}
+
+export async function moveStageAction(formData: FormData): Promise<void> {
+  const ctx = await requireRole("owner");
+  const parsed = z
+    .object({ stageId: z.string().uuid(), direction: z.enum(["up", "down"]) })
+    .parse({ stageId: formData.get("stageId"), direction: formData.get("direction") });
+  await withTenant(
+    ctx.tenant.id,
+    async (tx) => {
+      const data = await defaultPipelineStages(tx, ctx.tenant.id);
+      if (!data) return;
+      const open = data.rows.filter((s) => s.kind === "open");
+      const idx = open.findIndex((s) => s.id === parsed.stageId);
+      if (idx === -1) return; // won/lost stages are not reorderable
+      const swapWith = parsed.direction === "up" ? open[idx - 1] : open[idx + 1];
+      if (!swapWith) return;
+      const current = open[idx];
+      await tx.update(stages).set({ position: swapWith.position }).where(eq(stages.id, current.id));
+      await tx.update(stages).set({ position: current.position }).where(eq(stages.id, swapWith.id));
+    },
+    { userId: ctx.user.id }
+  );
+  revalidatePath("/app/configuracoes/funil");
 }
 
 // ------------------------------------------------------------ whatsapp -----

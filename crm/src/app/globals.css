@@ -49,4 +49,16 @@ body {
 .badge {
   @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium;
 }
+
+/* Styled selects: native element (keyboard/screen-reader friendly) with a
+   custom chevron instead of the browser default widget. */
+select.input {
+  @apply cursor-pointer appearance-none bg-no-repeat pr-8;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-position: right 0.5rem center;
+  background-size: 1rem;
+}
+select.input::-ms-expand {
+  display: none;
+}
 }

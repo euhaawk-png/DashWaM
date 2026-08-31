@@ -79,10 +79,14 @@ function StatusTicks({ status }: { status: string }) {
 
 export function InboxClient({
   isManager,
+  isOwner,
+  waConnected,
   userId,
   initialConversationId,
 }: {
   isManager: boolean;
+  isOwner: boolean;
+  waConnected: boolean;
   userId: string;
   initialConversationId: string | null;
 }) {
@@ -262,13 +266,32 @@ export function InboxClient({
           </div>
         </div>
         <div className="flex-1 overflow-y-auto">
-          {list.length === 0 && (
-            <div className="p-6 text-center text-sm text-muted">
-              Nenhuma conversa aqui ainda.
-              <br />
-              Quando um cliente mandar mensagem no WhatsApp da empresa, ela aparece nesta lista.
-            </div>
-          )}
+          {list.length === 0 &&
+            (!waConnected ? (
+              <div className="p-6 text-center text-sm">
+                <div className="mb-2 text-2xl">💬</div>
+                <p className="mb-1 font-semibold">Conecte seu WhatsApp para começar</p>
+                <p className="mb-4 text-muted">
+                  O inbox recebe as conversas do número oficial da empresa (API oficial da Meta, sem QR code).
+                  Cada conversa vira um lead no funil automaticamente.
+                </p>
+                {isOwner ? (
+                  <a href="/app/configuracoes/whatsapp" className="btn-primary inline-flex">
+                    Conectar WhatsApp
+                  </a>
+                ) : (
+                  <p className="text-xs text-muted">
+                    Peça ao dono da conta para conectar em Configurações → WhatsApp.
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="p-6 text-center text-sm text-muted">
+                Nenhuma conversa aqui ainda.
+                <br />
+                Quando um cliente mandar mensagem no WhatsApp da empresa, ela aparece nesta lista.
+              </div>
+            ))}
           {list.map((c) => (
             <button
               key={c.id}

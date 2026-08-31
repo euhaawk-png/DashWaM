@@ -10,11 +10,13 @@ export function ActionForm({
   action,
   submitLabel,
   className = "space-y-4",
+  submitClassName = "btn-primary",
   children,
 }: {
   action: (prev: State, formData: FormData) => Promise<State>;
   submitLabel: string;
   className?: string;
+  submitClassName?: string;
   children: React.ReactNode;
 }) {
   const [state, formAction] = useActionState<State, FormData>(action, {});
@@ -23,7 +25,7 @@ export function ActionForm({
       {children}
       {state.error && <p className="text-sm text-danger">{state.error}</p>}
       {state.ok && state.message && <p className="break-all text-sm text-ok">{state.message}</p>}
-      <SubmitButton className="btn-primary">{submitLabel}</SubmitButton>
+      <SubmitButton className={submitClassName}>{submitLabel}</SubmitButton>
     </form>
   );
 }
