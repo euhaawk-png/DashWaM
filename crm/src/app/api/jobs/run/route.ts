@@ -6,8 +6,11 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 /**
- * Background worker endpoint, triggered by cron (see vercel.json) or any
- * scheduler. Protected by CRON_SECRET (Authorization: Bearer <secret>).
+ * Background worker endpoint. Accepts both the Vercel cron invocation and any
+ * external scheduler (cron-job.org etc.) — both must send
+ * `Authorization: Bearer <CRON_SECRET>`; anything else gets 401.
+ * On Vercel Hobby the built-in cron runs only daily (vercel.json), so point an
+ * external scheduler here every minute for near-real-time jobs (see README).
  */
 export async function GET(req: NextRequest) {
   const secret = process.env.CRON_SECRET;

@@ -99,8 +99,11 @@ cruzada), que sem contexto de tenant nenhuma linha aparece, e que o audit log é
    `crm_app.<project-ref>` no transaction pooler (porta 6543).
 1. Importe o repositório com **Root Directory = `crm`**.
 2. Configure as variáveis do `.env.example` (produção: `APP_URL` público HTTPS).
-3. O cron de `vercel.json` chama `/api/jobs/run` a cada minuto (a Vercel envia
-   `Authorization: Bearer $CRON_SECRET` automaticamente).
+3. O cron de `vercel.json` chama `/api/jobs/run` 1x/dia (limite do plano Hobby).
+   **Sem Vercel Pro**, configure um agendador externo gratuito (ex.: cron-job.org)
+   chamando `GET https://<url-do-app>/api/jobs/run` a cada 1 minuto com o header
+   `Authorization: Bearer <CRON_SECRET>` — é isso que dá tempo real a boas-vindas,
+   alertas de demora e retentativas de webhook.
 4. Webhook da Meta: URL `https://SEU_DOMINIO/api/wa/webhook`, verify token =
    `META_WEBHOOK_VERIFY_TOKEN`, campos `messages` e `message_template_status_update`
    (e `leadgen` no webhook de Página, quando habilitado).
