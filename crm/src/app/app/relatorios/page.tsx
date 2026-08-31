@@ -57,7 +57,7 @@ export default async function ReportsPage({
     <div className="mx-auto max-w-5xl px-6 py-8">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold">Relatórios</h1>
+          <h1 className="text-xl font-extrabold">Relatórios</h1>
           {!manager && <p className="text-sm text-muted">Você vê apenas os seus próprios números.</p>}
         </div>
         <form className="flex items-end gap-2" action="/app/relatorios" method="GET">
@@ -77,19 +77,19 @@ export default async function ReportsPage({
       <div className="mb-6 grid gap-4 sm:grid-cols-4">
         <div className="card p-4">
           <div className="text-xs uppercase text-muted">Ganhos no período</div>
-          <div className="mt-1 text-2xl font-bold text-ok">{data.funnel.summary?.won ?? 0}</div>
+          <div className="mt-1 text-2xl font-extrabold text-ok">{data.funnel.summary?.won ?? 0}</div>
         </div>
         <div className="card p-4">
           <div className="text-xs uppercase text-muted">Perdidos</div>
-          <div className="mt-1 text-2xl font-bold text-danger">{data.funnel.summary?.lost ?? 0}</div>
+          <div className="mt-1 text-2xl font-extrabold text-danger">{data.funnel.summary?.lost ?? 0}</div>
         </div>
         <div className="card p-4">
           <div className="text-xs uppercase text-muted">Valor total ganho</div>
-          <div className="mt-1 text-2xl font-bold">{money(data.funnel.summary?.total_won_value)}</div>
+          <div className="mt-1 text-2xl font-extrabold">{money(data.funnel.summary?.total_won_value)}</div>
         </div>
         <div className="card p-4">
           <div className="text-xs uppercase text-muted">Ticket médio</div>
-          <div className="mt-1 text-2xl font-bold">{money(data.funnel.summary?.avg_ticket)}</div>
+          <div className="mt-1 text-2xl font-extrabold">{money(data.funnel.summary?.avg_ticket)}</div>
         </div>
       </div>
 

@@ -28,7 +28,7 @@ export default async function FormsPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-8">
-      <h1 className="mb-6 text-xl font-bold">Formulários de captação</h1>
+      <h1 className="mb-6 text-xl font-extrabold">Formulários de captação</h1>
 
       <div className="mb-8 space-y-4">
         {rows.length === 0 && (

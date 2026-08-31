@@ -56,7 +56,7 @@ export default async function ContactsPage({
   return (
     <div className="mx-auto max-w-5xl px-6 py-8">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl font-bold">Contatos</h1>
+        <h1 className="text-xl font-extrabold">Contatos</h1>
         <form className="flex gap-2" action="/app/contatos" method="GET">
           <input name="q" defaultValue={q} placeholder="Buscar nome, telefone ou e-mail…" className="input w-72 py-1.5 text-sm" />
           <button type="submit" className="btn-secondary py-1.5 text-sm">Buscar</button>

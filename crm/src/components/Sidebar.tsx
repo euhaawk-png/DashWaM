@@ -43,7 +43,16 @@ export function Sidebar({
       className={`flex h-full flex-col border-r border-line bg-paper transition-all ${collapsed ? "w-16" : "w-60"}`}
     >
       <div className="flex items-center justify-between px-4 py-4">
-        {!collapsed && <span className="text-lg font-bold tracking-tight">{brand.productName}</span>}
+        {!collapsed ? (
+          <span className="flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={brand.symbolUrl} alt="" className="h-5 w-auto" />
+            <span className="text-lg font-extrabold tracking-tight">{brand.productName}</span>
+          </span>
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={brand.symbolUrl} alt={brand.productName} className="mx-auto h-5 w-auto" />
+        )}
         <button
           type="button"
           onClick={() => setCollapsed((c) => !c)}

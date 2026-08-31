@@ -29,7 +29,7 @@ export default async function EditFormPage({ params }: { params: Promise<{ formI
   return (
     <div className="mx-auto max-w-3xl px-6 py-8">
       <Link href="/app/formularios" className="text-sm text-muted hover:text-ink">← Formulários</Link>
-      <h1 className="mb-6 mt-1 text-xl font-bold">Editar: {form.name}</h1>
+      <h1 className="mb-6 mt-1 text-xl font-extrabold">Editar: {form.name}</h1>
       <div className="card p-5">
         <FormBuilder
           action={saveFormAction}

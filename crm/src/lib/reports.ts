@@ -22,7 +22,7 @@ export async function firstResponseReport(tx: Tx, tenantId: string, p: Period, o
     LEFT JOIN users u ON u.id = c.assigned_to
     WHERE c.tenant_id = ${tenantId}
       AND c.first_response_at IS NOT NULL
-      AND c.created_at BETWEEN ${p.from} AND ${p.to}
+      AND c.created_at BETWEEN ${p.from.toISOString()} AND ${p.to.toISOString()}
       ${onlyUserId ? sql`AND c.assigned_to = ${onlyUserId}` : sql``}
     GROUP BY c.assigned_to, u.name
     ORDER BY median_minutes NULLS LAST
@@ -40,7 +40,7 @@ export async function leadsBySourceReport(tx: Tx, tenantId: string, p: Period, o
            coalesce(sum(d.value) FILTER (WHERE d.won_at IS NOT NULL), 0)::float AS total_value
     FROM deals d
     WHERE d.tenant_id = ${tenantId}
-      AND d.created_at BETWEEN ${p.from} AND ${p.to}
+      AND d.created_at BETWEEN ${p.from.toISOString()} AND ${p.to.toISOString()}
       ${onlyUserId ? sql`AND d.owner_id = ${onlyUserId}` : sql``}
     GROUP BY d.source
     ORDER BY leads DESC
@@ -61,7 +61,7 @@ export async function funnelReport(tx: Tx, tenantId: string, p: Period, onlyUser
   const scope = onlyUserId ? sql`AND d.owner_id = ${onlyUserId}` : sql``;
   const stages = (await tx.execute(sql`
     SELECT s.id AS stage_id, s.name AS stage_name, s.kind, s.position,
-           count(d.id) FILTER (WHERE d.created_at BETWEEN ${p.from} AND ${p.to} ${scope})::int AS deals
+           count(d.id) FILTER (WHERE d.created_at BETWEEN ${p.from.toISOString()} AND ${p.to.toISOString()} ${scope})::int AS deals
     FROM stages s
     JOIN pipelines pl ON pl.id = s.pipeline_id AND pl.is_default = true
     LEFT JOIN deals d ON d.stage_id = s.id
@@ -70,17 +70,17 @@ export async function funnelReport(tx: Tx, tenantId: string, p: Period, onlyUser
     ORDER BY s.position
   `)) as unknown as FunnelRow[];
   const [summary] = (await tx.execute(sql`
-    SELECT count(*) FILTER (WHERE d.won_at BETWEEN ${p.from} AND ${p.to})::int AS won,
-           count(*) FILTER (WHERE d.lost_at BETWEEN ${p.from} AND ${p.to})::int AS lost,
-           coalesce(sum(d.value) FILTER (WHERE d.won_at BETWEEN ${p.from} AND ${p.to}), 0)::float AS total_won_value,
-           round(avg(d.value) FILTER (WHERE d.won_at BETWEEN ${p.from} AND ${p.to})::numeric, 2)::float AS avg_ticket
+    SELECT count(*) FILTER (WHERE d.won_at BETWEEN ${p.from.toISOString()} AND ${p.to.toISOString()})::int AS won,
+           count(*) FILTER (WHERE d.lost_at BETWEEN ${p.from.toISOString()} AND ${p.to.toISOString()})::int AS lost,
+           coalesce(sum(d.value) FILTER (WHERE d.won_at BETWEEN ${p.from.toISOString()} AND ${p.to.toISOString()}), 0)::float AS total_won_value,
+           round(avg(d.value) FILTER (WHERE d.won_at BETWEEN ${p.from.toISOString()} AND ${p.to.toISOString()})::numeric, 2)::float AS avg_ticket
     FROM deals d
     WHERE d.tenant_id = ${tenantId} ${scope}
   `)) as unknown as FunnelSummary[];
   const lostReasons = (await tx.execute(sql`
     SELECT coalesce(nullif(trim(d.lost_reason), ''), 'não informado') AS reason, count(*)::int AS count
     FROM deals d
-    WHERE d.tenant_id = ${tenantId} AND d.lost_at BETWEEN ${p.from} AND ${p.to} ${scope}
+    WHERE d.tenant_id = ${tenantId} AND d.lost_at BETWEEN ${p.from.toISOString()} AND ${p.to.toISOString()} ${scope}
     GROUP BY 1 ORDER BY 2 DESC LIMIT 10
   `)) as unknown as LostReasonRow[];
   return { stages, summary, lostReasons };
@@ -101,16 +101,16 @@ export async function productivityReport(tx: Tx, tenantId: string, p: Period, on
     SELECT u.id AS user_id, u.name AS user_name,
       (SELECT count(*) FROM conversations c
         WHERE c.tenant_id = ${tenantId} AND c.assigned_to = u.id
-          AND c.first_response_at BETWEEN ${p.from} AND ${p.to})::int AS conversations_handled,
+          AND c.first_response_at BETWEEN ${p.from.toISOString()} AND ${p.to.toISOString()})::int AS conversations_handled,
       (SELECT count(*) FROM messages m
         WHERE m.tenant_id = ${tenantId} AND m.author_id = u.id AND m.direction = 'out'
-          AND m.is_internal_note = false AND m.created_at BETWEEN ${p.from} AND ${p.to})::int AS messages_sent,
+          AND m.is_internal_note = false AND m.created_at BETWEEN ${p.from.toISOString()} AND ${p.to.toISOString()})::int AS messages_sent,
       (SELECT count(*) FROM deals d
         WHERE d.tenant_id = ${tenantId} AND d.owner_id = u.id
-          AND d.won_at BETWEEN ${p.from} AND ${p.to})::int AS deals_won,
+          AND d.won_at BETWEEN ${p.from.toISOString()} AND ${p.to.toISOString()})::int AS deals_won,
       (SELECT coalesce(sum(d.value), 0) FROM deals d
         WHERE d.tenant_id = ${tenantId} AND d.owner_id = u.id
-          AND d.won_at BETWEEN ${p.from} AND ${p.to})::float AS value_won
+          AND d.won_at BETWEEN ${p.from.toISOString()} AND ${p.to.toISOString()})::float AS value_won
     FROM memberships ms
     JOIN users u ON u.id = ms.user_id
     WHERE ms.tenant_id = ${tenantId} AND ms.status = 'active'

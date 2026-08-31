@@ -30,7 +30,7 @@ export default async function AdminPage() {
     <div className="mx-auto max-w-5xl px-6 py-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold">{brand.productName} · Admin da plataforma</h1>
+          <h1 className="text-xl font-extrabold">{brand.productName} · Admin da plataforma</h1>
           <p className="text-sm text-muted">Gestão operacional de tenants. Sem acesso ao conteúdo das conversas.</p>
         </div>
         <form action={logoutAction}>

@@ -60,7 +60,7 @@ export default async function WebhookDetailPage({ params }: { params: Promise<{ 
   return (
     <div className="mx-auto max-w-4xl px-6 py-8">
       <Link href="/app/integracoes" className="text-sm text-muted hover:text-ink">← Integrações</Link>
-      <h1 className="mb-6 mt-1 text-xl font-bold">{hook.name}</h1>
+      <h1 className="mb-6 mt-1 text-xl font-extrabold">{hook.name}</h1>
 
       {(hook.type === "wordpress" || hook.type === "generic") && (
         <div className="card mb-6 p-5">

@@ -9,6 +9,7 @@ const config: Config = {
       colors: {
         accent: {
           DEFAULT: "rgb(var(--accent) / <alpha-value>)",
+          hover: "rgb(var(--accent-hover) / <alpha-value>)",
           soft: "rgb(var(--accent-soft) / <alpha-value>)",
         },
         ink: "#0A0A0A",

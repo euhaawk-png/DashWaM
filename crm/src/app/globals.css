@@ -4,8 +4,9 @@
 
 /* Brand tokens — keep in sync with src/config/brand.ts (single rebrand point). */
 :root {
-  --accent: 79 70 229;
-  --accent-soft: 238 237 252;
+  --accent: 37 99 235; /* #2563EB */
+  --accent-hover: 29 78 216; /* #1D4ED8 */
+  --accent-soft: 239 246 255; /* #EFF6FF */
 }
 
 html,
@@ -29,7 +30,7 @@ body {
   @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50;
 }
 .btn-primary {
-  @apply btn bg-accent text-white hover:bg-accent/90;
+  @apply btn bg-accent text-white hover:bg-accent-hover;
 }
 .btn-secondary {
   @apply btn border border-line bg-paper text-ink hover:bg-gray-50;

@@ -63,7 +63,7 @@ export default async function IntegrationsPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-8">
-      <h1 className="mb-1 text-xl font-bold">Integrações</h1>
+      <h1 className="mb-1 text-xl font-extrabold">Integrações</h1>
       <p className="mb-6 text-sm text-muted">
         Conecte as origens de leads da empresa — os leads caem direto no funil, sem Make ou Zapier.
       </p>

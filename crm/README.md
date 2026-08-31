@@ -1,4 +1,10 @@
-# CRM — SaaS multi-tenant de atendimento comercial via WhatsApp
+# Ezo — SaaS multi-tenant de atendimento comercial via WhatsApp
+
+> **Marca**: os assets oficiais vivem em `public/brand/` (símbolo azul #2563EB, mono preto,
+> negativa branca, logo horizontal e ícones). Regras do manual: nunca redesenhar, distorcer,
+> girar ou aplicar sombra/brilho/gradiente ao símbolo; sobre azul, usar sempre a negativa
+> branca; respiro mínimo ao redor igual à largura do símbolo. Tokens de cor/tipografia
+> centralizados em `src/config/brand.ts` + `globals.css` (rebrand em um lugar só).
 
 CRM estilo Kommo/RD Station focado em atendimento via **WhatsApp Cloud API oficial da Meta**
 (sem QR code / engenharia reversa). Multi-tenant real desde o commit 1, com isolamento por

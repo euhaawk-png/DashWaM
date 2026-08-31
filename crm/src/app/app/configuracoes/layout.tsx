@@ -18,7 +18,7 @@ export default async function SettingsLayout({ children }: { children: React.Rea
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-8">
-      <h1 className="mb-4 text-xl font-bold">Configurações</h1>
+      <h1 className="mb-4 text-xl font-extrabold">Configurações</h1>
       <nav className="mb-6 flex flex-wrap gap-1 border-b border-line">
         {tabs.map((t) => (
           <Link

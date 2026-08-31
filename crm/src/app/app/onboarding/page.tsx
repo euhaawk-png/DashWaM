@@ -51,7 +51,7 @@ export default async function OnboardingPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-10">
-      <h1 className="mb-2 text-xl font-bold">Primeiros passos</h1>
+      <h1 className="mb-2 text-xl font-extrabold">Primeiros passos</h1>
       <p className="mb-6 text-sm text-muted">
         Configure sua conta em poucos minutos. Seu progresso fica salvo — você pode voltar quando quiser.
       </p>

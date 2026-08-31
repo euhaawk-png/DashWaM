@@ -16,7 +16,7 @@ export default async function SelectTenantPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4">
       <div className="mb-8 text-center">
-        <div className="text-2xl font-bold tracking-tight">{brand.productName}</div>
+        <div className="text-2xl font-extrabold tracking-tight">{brand.productName}</div>
       </div>
       <div className="card w-full max-w-sm p-6 shadow-sm">
         <h1 className="mb-1 text-lg font-semibold">Selecionar empresa</h1>

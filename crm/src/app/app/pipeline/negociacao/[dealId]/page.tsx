@@ -100,7 +100,7 @@ export default async function DealPage({ params }: { params: Promise<{ dealId: s
       <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div>
           <Link href="/app/pipeline" className="text-sm text-muted hover:text-ink">← Pipeline</Link>
-          <h1 className="mt-1 text-xl font-bold">{contact?.name ?? deal.title}</h1>
+          <h1 className="mt-1 text-xl font-extrabold">{contact?.name ?? deal.title}</h1>
           <p className="text-sm text-muted">
             {formatPhone(contact?.phone ?? null)}
             {contact?.email ? ` · ${contact.email}` : ""}
