@@ -9,9 +9,18 @@ const SESSION_COOKIE = "crm_session";
  */
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+  const hasSession = Boolean(req.cookies.get(SESSION_COOKIE));
+  // Logged-in users skip the public marketing home and land in the app.
+  // (Cookie presence only: an invalid session bounces back at /app's guard.)
+  if (pathname === "/" && hasSession) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/app/inbox";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
   const isProtected =
     pathname.startsWith("/app") || pathname.startsWith("/admin") || pathname.startsWith("/selecionar-empresa");
-  if (isProtected && !req.cookies.get(SESSION_COOKIE)) {
+  if (isProtected && !hasSession) {
     const url = req.nextUrl.clone();
     url.pathname = "/login";
     url.search = "";
@@ -21,5 +30,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/app/:path*", "/admin/:path*", "/selecionar-empresa"],
+  matcher: ["/", "/app/:path*", "/admin/:path*", "/selecionar-empresa"],
 };

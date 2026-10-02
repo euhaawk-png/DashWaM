@@ -20,4 +20,6 @@ export const brand = {
   symbolWhiteUrl: "/brand/ezo-simbolo-branco.svg",
   symbolBlackUrl: "/brand/ezo-simbolo-preto.svg",
   logoHorizontalUrl: "/brand/ezo-logo-horizontal.svg",
+  /** CTA da home: WhatsApp comercial da Ezcala (placeholder até o número real). */
+  ezcalaWhatsappUrl: process.env.EZCALA_WHATSAPP_URL ?? "https://wa.me/5500000000000",
 };
