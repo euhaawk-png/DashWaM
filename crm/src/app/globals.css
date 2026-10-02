@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Brand tokens — keep in sync with src/config/brand.ts (single rebrand point). */
+:root {
+  --accent: 37 99 235; /* #2563EB */
+  --accent-hover: 29 78 216; /* #1D4ED8 */
+  --accent-soft: 239 246 255; /* #EFF6FF */
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  @apply bg-paper text-ink antialiased;
+  font-feature-settings: "cv11";
+}
+
+/* Minimal form defaults so every input looks consistent. Registered in the
+   components layer so width/spacing utilities can override them. */
+@layer components {
+.input {
+  @apply w-full rounded-md border border-line bg-paper px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted focus:border-accent focus:ring-2 focus:ring-accent/20;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+}
+.btn-primary {
+  @apply btn bg-accent text-white hover:bg-accent-hover;
+}
+.btn-secondary {
+  @apply btn border border-line bg-paper text-ink hover:bg-gray-50;
+}
+.btn-danger {
+  @apply btn border border-danger/30 bg-paper text-danger hover:bg-danger/5;
+}
+
+.card {
+  @apply rounded-lg border border-line bg-paper;
+}
+
+.label {
+  @apply mb-1 block text-sm font-medium text-ink;
+}
+
+.badge {
+  @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium;
+}
+
+/* Styled selects: native element (keyboard/screen-reader friendly) with a
+   custom chevron instead of the browser default widget. */
+select.input {
+  @apply cursor-pointer appearance-none bg-no-repeat pr-8;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-position: right 0.5rem center;
+  background-size: 1rem;
+}
+select.input::-ms-expand {
+  display: none;
+}
+}
