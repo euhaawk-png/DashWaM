@@ -5,6 +5,7 @@ import { withTenant } from "@/db";
 import { contacts, conversations, messages, waTemplates, whatsappAccounts } from "@/db/schema";
 import { apiTenantCtx, sameOrigin } from "@/lib/auth/guard";
 import { getAccessibleConversation, windowState } from "@/lib/inbox";
+import { incrementWaUsage } from "@/lib/wa-usage";
 import { sendTemplateMessage, sendTextMessage, WaApiError } from "@/lib/whatsapp/client";
 
 const bodySchema = z.object({
@@ -122,6 +123,9 @@ export async function POST(req: NextRequest) {
           ...(conversation.status === "closed" ? { status: "open" as const } : {}),
         })
         .where(eq(conversations.id, conversationId));
+
+      // Meta service-message quota proxy (free text and templates both count).
+      await incrementWaUsage(tx, ctx.tenant.id, account.phoneNumberId);
 
       return { status: 200 as const, message };
     },

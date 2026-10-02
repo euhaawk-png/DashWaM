@@ -343,6 +343,25 @@ export const notifications = pgTable("notifications", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const waUsageMonthly = pgTable(
+  "wa_usage_monthly",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull(),
+    phoneNumberId: text("phone_number_id").notNull(),
+    month: text("month").notNull(), // 'YYYY-MM-01' (date column; text mapping keeps tz handling in app code)
+    serviceMessagesSent: integer("service_messages_sent").notNull().default(0),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("wa_usage_uq").on(t.tenantId, t.phoneNumberId, t.month)]
+);
+
+export const platformSettings = pgTable("platform_settings", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const activityLog = pgTable("activity_log", {
   id: uuid("id").primaryKey().defaultRandom(),
   tenantId: uuid("tenant_id").notNull(),

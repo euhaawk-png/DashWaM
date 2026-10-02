@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { withTenant } from "@/db";
 import { waTemplates, whatsappAccounts } from "@/db/schema";
 import { requireRole } from "@/lib/auth/guard";
+import { FREE_SERVICE_MESSAGES_PER_MONTH, getMonthUsage, getServiceMsgPriceBrl } from "@/lib/wa-usage";
 import { ActionForm } from "@/components/ActionForm";
 import { EmbeddedSignupButton } from "@/components/EmbeddedSignupButton";
 import { createTemplateAction, refreshWaStatusAction, syncTemplatesAction } from "../actions";
@@ -13,16 +14,25 @@ const QUALITY_LABEL: Record<string, string> = { GREEN: "Alta", YELLOW: "Média",
 
 export default async function WhatsappSettingsPage() {
   const ctx = await requireRole("owner");
-  const { account, templates } = await withTenant(
+  const { account, templates, usage } = await withTenant(
     ctx.tenant.id,
-    async (tx) => ({
-      account: (
+    async (tx) => {
+      const account = (
         await tx.select().from(whatsappAccounts).where(eq(whatsappAccounts.tenantId, ctx.tenant.id)).limit(1)
-      )[0],
-      templates: await tx.select().from(waTemplates).where(eq(waTemplates.tenantId, ctx.tenant.id)),
-    }),
+      )[0];
+      return {
+        account,
+        templates: await tx.select().from(waTemplates).where(eq(waTemplates.tenantId, ctx.tenant.id)),
+        usage: account ? await getMonthUsage(tx, ctx.tenant.id, account.phoneNumberId) : 0,
+      };
+    },
     { userId: ctx.user.id }
   );
+  const unitPrice = await getServiceMsgPriceBrl();
+  const free = FREE_SERVICE_MESSAGES_PER_MONTH;
+  const pct = Math.min(100, Math.round((usage / free) * 100));
+  const over = Math.max(0, usage - free);
+  const estimate = over * unitPrice;
 
   return (
     <div className="space-y-6">
@@ -81,6 +91,50 @@ export default async function WhatsappSettingsPage() {
           </div>
         )}
       </div>
+
+      {account && (
+        <div className="card max-w-xl p-5">
+          <div className="mb-1 flex items-center justify-between gap-2">
+            <h2 className="font-semibold">Consumo de mensagens (Meta)</h2>
+            {pct >= 100 ? (
+              <span className="badge bg-danger/10 text-danger">Franquia esgotada</span>
+            ) : pct >= 80 ? (
+              <span className="badge bg-warn/10 text-warn">{pct}% da franquia</span>
+            ) : (
+              <span className="badge bg-ok/10 text-ok">Dentro da franquia</span>
+            )}
+          </div>
+          <p className="mb-3 text-sm text-muted">
+            {usage.toLocaleString("pt-BR")} de {free.toLocaleString("pt-BR")} mensagens grátis usadas este mês
+          </p>
+          <div className="mb-3 h-2.5 rounded-full bg-gray-100">
+            <div
+              className={`h-2.5 rounded-full ${pct >= 100 ? "bg-danger" : pct >= 80 ? "bg-warn" : "bg-accent"}`}
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          {over > 0 && (
+            <p className="mb-2 text-sm">
+              Excedente: <strong>{over.toLocaleString("pt-BR")}</strong> mensagem(ns) · estimativa:{" "}
+              <strong>
+                ~{unitPrice.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 3 })} ×{" "}
+                {over.toLocaleString("pt-BR")} ={" "}
+                {estimate.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+              </strong>
+            </p>
+          )}
+          <p
+            className="text-xs text-muted"
+            title="O Ezo conta localmente as mensagens de serviço enviadas por este número. A cobrança oficial é feita pela Meta, por mensagem ENTREGUE, direto na conta da sua empresa."
+          >
+            ℹ️ Regra da Meta desde 01/10/2026: receber é grátis; 1.000 respostas grátis por número/mês; acima
+            disso ~{unitPrice.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 3 })}{" "}
+            por mensagem entregue no Brasil (templates de utilidade na janela também contam; conversa iniciada
+            por anúncio tem 72h livres). A cobrança é da <strong>Meta, na conta da sua empresa</strong> — este
+            número é uma estimativa local do Ezo, que não cobra por mensagem nem por atendente.
+          </p>
+        </div>
+      )}
 
       <div className="card max-w-xl p-5">
         <div className="mb-4 flex items-center justify-between">

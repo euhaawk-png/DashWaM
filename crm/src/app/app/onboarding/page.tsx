@@ -92,10 +92,18 @@ export default async function OnboardingPage() {
             {data.connected ? (
               <p className="text-sm text-ok">WhatsApp conectado. ✓</p>
             ) : (
-              <p className="text-sm text-muted">
-                A conexão usa a API oficial da Meta (sem QR code). Você vai precisar do login do Facebook da
-                empresa. Pode pular e conectar depois em Configurações → WhatsApp.
-              </p>
+              <>
+                <p className="text-sm text-muted">
+                  A conexão usa a API oficial da Meta (sem QR code). Você vai precisar do login do Facebook da
+                  empresa. Pode pular e conectar depois em Configurações → WhatsApp.
+                </p>
+                <p className="rounded-md bg-accent-soft px-3 py-2 text-xs text-gray-700">
+                  💡 Custo da Meta (desde 01/10/2026): receber mensagens é grátis e cada número tem 1.000
+                  respostas grátis por mês; acima disso a Meta cobra ~R$ 0,035 por mensagem entregue, direto na
+                  conta da sua empresa (anúncio clique-para-WhatsApp dá 72h livres). O Ezo não cobra por
+                  mensagem nem por atendente — você acompanha a franquia em Configurações → WhatsApp.
+                </p>
+              </>
             )}
             <div className="flex gap-2">
               {!data.connected && (

@@ -169,3 +169,29 @@ export async function fetchLeadgenLead(leadgenId: string, pageToken: string) {
   if (!res.ok) throw new WaApiError(res.status, json);
   return json;
 }
+
+/** Lists the lead forms of a connected Page (re-poll recovery routine). */
+export async function listPageLeadForms(pageId: string, pageToken: string) {
+  const res = await fetch(`${GRAPH()}/${pageId}/leadgen_forms?fields=id,name&limit=50`, {
+    headers: { Authorization: `Bearer ${pageToken}` },
+  });
+  const json = (await res.json()) as { data?: Array<{ id: string; name?: string }> };
+  if (!res.ok) throw new WaApiError(res.status, json);
+  return json.data ?? [];
+}
+
+/** Lists a form's recent leads since a unix timestamp (recovery re-poll). */
+export async function listRecentFormLeads(formId: string, pageToken: string, sinceUnix: number) {
+  const filtering = encodeURIComponent(
+    JSON.stringify([{ field: "time_created", operator: "GREATER_THAN", value: sinceUnix }])
+  );
+  const res = await fetch(
+    `${GRAPH()}/${formId}/leads?fields=id,created_time,field_data,ad_id&limit=100&filtering=${filtering}`,
+    { headers: { Authorization: `Bearer ${pageToken}` } }
+  );
+  const json = (await res.json()) as {
+    data?: Array<{ id: string; field_data?: Array<{ name: string; values: string[] }>; ad_id?: string }>;
+  };
+  if (!res.ok) throw new WaApiError(res.status, json);
+  return json.data ?? [];
+}

@@ -544,3 +544,37 @@ BEGIN
   ON CONFLICT (tenant_id, user_id) DO UPDATE SET role = EXCLUDED.role, status = 'active';
 END
 $seed$;
+
+-- ======================= 0002_wa_usage.sql (idempotente) ====================
+-- Contador local de mensagens de serviço da Meta (regra de 01/10/2026) e
+-- configurações da plataforma. Cobrança oficial é da Meta; isto é estimativa.
+
+CREATE TABLE IF NOT EXISTS wa_usage_monthly (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id uuid NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  phone_number_id text NOT NULL,
+  month date NOT NULL,
+  service_messages_sent int NOT NULL DEFAULT 0,
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (tenant_id, phone_number_id, month)
+);
+
+ALTER TABLE wa_usage_monthly ENABLE ROW LEVEL SECURITY;
+ALTER TABLE wa_usage_monthly FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON wa_usage_monthly;
+CREATE POLICY tenant_isolation ON wa_usage_monthly FOR ALL
+  USING (tenant_id = current_tenant_id())
+  WITH CHECK (tenant_id = current_tenant_id());
+DROP POLICY IF EXISTS platform_admin_read ON wa_usage_monthly;
+CREATE POLICY platform_admin_read ON wa_usage_monthly FOR SELECT
+  USING (is_platform_admin_ctx());
+
+CREATE TABLE IF NOT EXISTS platform_settings (
+  key text PRIMARY KEY,
+  value text NOT NULL,
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON wa_usage_monthly, platform_settings TO crm_app;
+
+INSERT INTO _migrations (name) VALUES ('0002_wa_usage.sql') ON CONFLICT (name) DO NOTHING;

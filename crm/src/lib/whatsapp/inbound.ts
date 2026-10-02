@@ -13,6 +13,7 @@ import {
 } from "@/db/schema";
 import { createLead, ensureContact } from "@/lib/leads";
 import { pickAssignee } from "@/lib/routing";
+import { incrementWaUsage } from "@/lib/wa-usage";
 import { sendTextMessage } from "./client";
 
 // --- Cloud API webhook payload types (the subset we consume) ---------------
@@ -287,6 +288,7 @@ export async function sendWelcomeMessage(tx: Tx, tenantId: string, conversationI
     waMessageId: res.messages?.[0]?.id ?? null,
     status: "sent",
   });
+  await incrementWaUsage(tx, tenantId, account.phoneNumberId);
   await tx
     .update(conversations)
     .set({ lastMessageAt: new Date(), lastMessagePreview: text.slice(0, 120) })

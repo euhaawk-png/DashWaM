@@ -49,6 +49,8 @@ Usuários do seed (senha `Trocar-esta-senha-123`, ou defina `SEED_PASSWORD`):
 | `META_GRAPH_VERSION` | opcional (padrão v23.0) | opcional | Versão da Graph API |
 | `META_LEADGEN_ENABLED` | opcional (padrão false) | opcional | Feature flag do conector Meta Lead Ads |
 | `RESEND_API_KEY` / `EMAIL_FROM` | opcionais (e-mails vão para o console) | obrigatórias | E-mail transacional |
+| `EZCALA_WHATSAPP_URL` | opcional | recomendada | CTA "Falar com a Ezcala" da home pública |
+| `META_SERVICE_MSG_BRL` | opcional (padrão 0.035) | opcional | Preço unitário da msg de serviço da Meta acima da franquia (editável no super admin) |
 | `SEED_PASSWORD` | opcional | não usar seed em produção | Senha dos usuários do seed |
 
 > **Importante:** `DATABASE_URL` deve apontar para o papel `crm_app` (criado pela migração
@@ -113,6 +115,18 @@ cruzada), que sem contexto de tenant nenhuma linha aparece, e que o audit log é
 4. Webhook da Meta: URL `https://SEU_DOMINIO/api/wa/webhook`, verify token =
    `META_WEBHOOK_VERIFY_TOKEN`, campos `messages` e `message_template_status_update`
    (e `leadgen` no webhook de Página, quando habilitado).
+
+## Custos de mensagens da Meta (regra vigente desde 01/10/2026)
+
+A Meta passou a cobrar mensagens de serviço: **receber é grátis**; cada número tem
+**1.000 respostas grátis por mês**; acima disso a cobrança é **por mensagem ENTREGUE**
+(~R$ 0,035 no Brasil — ajustável em `META_SERVICE_MSG_BRL`/super admin). Templates de
+utilidade dentro da janela também contam; conversa iniciada por anúncio
+clique-para-WhatsApp tem 72h livres. O Ezo mantém um **contador local por
+tenant/número** (proxy de mensagens enviadas, zera no dia 1º no fuso America/Sao_Paulo)
+com barra de franquia e alertas a 80%/100% em Configurações → WhatsApp e painel de
+consumo no super admin. A cobrança oficial é da **Meta, na conta do cliente** — o Ezo
+não cobra por mensagem nem por atendente.
 
 ## Checklist de segurança (seção 9 do escopo)
 
