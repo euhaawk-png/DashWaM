@@ -4,6 +4,7 @@ import { withTenant } from "@/db";
 import { inboundWebhooks, whatsappAccounts } from "@/db/schema";
 import { requireRole } from "@/lib/auth/guard";
 import { ActionForm } from "@/components/ActionForm";
+import { EmptyState } from "@/components/EmptyState";
 import { createWebhookAction, deleteWebhookAction, toggleWebhookAction } from "./actions";
 
 export const metadata = { title: "Integrações" };
@@ -148,8 +149,11 @@ export default async function IntegrationsPage() {
       <h2 className="mb-3 font-semibold">Conexões criadas</h2>
       <div className="space-y-4">
         {hooks.length === 0 && (
-          <div className="card p-6 text-center text-sm text-muted">
-            Nenhuma conexão de entrada ainda. Crie a primeira nos cards acima.
+          <div className="card">
+            <EmptyState
+              title="Nenhuma conexão de entrada ainda"
+              text="Crie a primeira nos cards acima — os leads do Google Ads, do site e do WordPress passam a cair direto no funil."
+            />
           </div>
         )}
         {hooks.map((h) => (

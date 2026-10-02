@@ -43,27 +43,38 @@ export function Sidebar({
       className={`flex h-full flex-col border-r border-line bg-paper transition-all ${collapsed ? "w-16" : "w-60"}`}
     >
       <div className="flex items-center justify-between px-4 py-4">
-        {!collapsed ? (
-          <span className="flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={brand.symbolUrl} alt="" className="h-5 w-auto" />
-            <span className="text-lg font-extrabold tracking-tight">{brand.productName}</span>
-          </span>
-        ) : (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={brand.symbolUrl} alt={brand.productName} className="mx-auto h-5 w-auto" />
-        )}
+        {/* Brand manual: sidebar shows the symbol alone, no wordmark. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={brand.symbolUrl}
+          alt={brand.productName}
+          title={brand.productName}
+          className={`h-6 w-auto ${collapsed ? "mx-auto" : ""}`}
+        />
         <button
           type="button"
           onClick={() => setCollapsed((c) => !c)}
-          className="rounded p-1 text-muted hover:bg-gray-100 hover:text-ink"
-          aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
+          className={`rounded p-1 text-muted hover:bg-gray-100 hover:text-ink ${collapsed ? "hidden" : ""}`}
+          aria-label="Recolher menu"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
           </svg>
         </button>
       </div>
+      {collapsed && (
+        <button
+          type="button"
+          onClick={() => setCollapsed(false)}
+          className="mx-auto mb-2 rounded p-1 text-muted hover:bg-gray-100 hover:text-ink"
+          aria-label="Expandir menu"
+          title="Expandir menu"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
+          </svg>
+        </button>
+      )}
       {!collapsed && (
         <div className="mx-4 mb-3 truncate rounded-md bg-gray-50 px-3 py-2 text-xs font-medium text-muted">
           {tenantName}

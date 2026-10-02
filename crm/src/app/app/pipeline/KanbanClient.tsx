@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { EmptyState } from "@/components/EmptyState";
 
 type Stage = { id: string; name: string; kind: string };
 type Deal = {
@@ -109,6 +110,19 @@ export function KanbanClient({
           ))}
         </select>
       </div>
+
+      {deals.length === 0 && (
+        <div className="px-4 pt-4">
+          <div className="card">
+            <EmptyState
+              title="Nenhuma negociação ainda"
+              text="Cada conversa do WhatsApp e cada lead de formulário ou anúncio vira um card aqui automaticamente. Você também pode criar um lead manual."
+              actionHref="/app/contatos"
+              actionLabel="Criar lead manual"
+            />
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-1 gap-3 overflow-x-auto p-4">
         {stages.map((stage) => {

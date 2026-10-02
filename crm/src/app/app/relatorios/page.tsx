@@ -1,3 +1,4 @@
+import { EmptyState } from "@/components/EmptyState";
 import { withTenant } from "@/db";
 import { requireTenant } from "@/lib/auth/guard";
 import { isManager } from "@/lib/inbox";
@@ -133,7 +134,12 @@ export default async function ReportsPage({
             <a href={`${csvBase}&type=origens`} className="text-xs text-accent hover:underline">Exportar CSV</a>
           </div>
           {data.sources.length === 0 ? (
-            <p className="text-sm text-muted">Nenhum lead no período.</p>
+            <EmptyState
+              title="Nenhum lead no período"
+              text="Ajuste o período acima ou capte leads conectando o WhatsApp, formulários e anúncios."
+              actionHref="/app/integracoes"
+              actionLabel="Ver integrações"
+            />
           ) : (
             <div className="space-y-2">
               {data.sources.map((s) => (

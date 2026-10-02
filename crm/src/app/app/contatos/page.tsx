@@ -4,6 +4,7 @@ import { contacts } from "@/db/schema";
 import { requireTenant } from "@/lib/auth/guard";
 import { formatPhone } from "@/lib/phone";
 import { ActionForm } from "@/components/ActionForm";
+import { EmptyState } from "@/components/EmptyState";
 import { createManualLeadAction, deleteContactAction } from "../pipeline/actions";
 
 export const metadata = { title: "Contatos" };
@@ -122,8 +123,17 @@ export default async function ContactsPage({
             ))}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-10 text-center text-sm text-muted">
-                  {q ? "Nenhum contato encontrado para esta busca." : "Nenhum contato ainda. Eles são criados automaticamente quando um cliente chama no WhatsApp ou preenche um formulário."}
+                <td colSpan={6}>
+                  <EmptyState
+                    title={q ? "Nenhum contato encontrado" : "Nenhum contato ainda"}
+                    text={
+                      q
+                        ? "Confira a grafia ou tente buscar só por parte do nome ou do telefone."
+                        : "Contatos são criados automaticamente quando um cliente chama no WhatsApp ou preenche um formulário — ou crie um lead manual acima."
+                    }
+                    actionHref={q ? "/app/contatos" : "/app/configuracoes/whatsapp"}
+                    actionLabel={q ? "Limpar busca" : "Conectar WhatsApp"}
+                  />
                 </td>
               </tr>
             )}

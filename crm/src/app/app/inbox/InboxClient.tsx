@@ -247,7 +247,7 @@ export function InboxClient({
   return (
     <div className="flex h-full">
       {/* Column 1 — conversation list */}
-      <div className="flex w-80 shrink-0 flex-col border-r border-line bg-paper">
+      <div className={`w-full shrink-0 flex-col border-r border-line bg-paper md:flex md:w-80 ${selectedId ? "hidden" : "flex"}`}>
         <div className="border-b border-line p-3">
           <h1 className="mb-2 text-base font-semibold">Inbox</h1>
           <div className="flex flex-wrap gap-1">
@@ -328,7 +328,7 @@ export function InboxClient({
       </div>
 
       {/* Column 2 — thread */}
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className={`min-w-0 flex-1 flex-col md:flex ${selectedId ? "flex" : "hidden"}`}>
         {!detail ? (
           <div className="flex flex-1 items-center justify-center text-sm text-muted">
             Selecione uma conversa para atender.
@@ -336,7 +336,15 @@ export function InboxClient({
         ) : (
           <>
             <div className="flex items-center justify-between border-b border-line bg-paper px-4 py-2.5">
-              <div className="min-w-0">
+              <button
+                type="button"
+                onClick={() => setSelectedId(null)}
+                className="mr-2 rounded-md border border-line px-2 py-1 text-sm md:hidden"
+                aria-label="Voltar para a lista"
+              >
+                ←
+              </button>
+              <div className="min-w-0 flex-1">
                 <div className="truncate text-sm font-semibold">
                   {detail.contact.name ?? detail.contact.phone}
                 </div>

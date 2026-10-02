@@ -3,6 +3,7 @@ import { desc, eq, sql } from "drizzle-orm";
 import { withTenant } from "@/db";
 import { forms, formSubmissions } from "@/db/schema";
 import { requireRole } from "@/lib/auth/guard";
+import { EmptyState } from "@/components/EmptyState";
 import { FormBuilder } from "./FormBuilder";
 import { deleteFormAction, saveFormAction } from "./actions";
 
@@ -32,8 +33,13 @@ export default async function FormsPage() {
 
       <div className="mb-8 space-y-4">
         {rows.length === 0 && (
-          <div className="card p-6 text-center text-sm text-muted">
-            Nenhum formulário ainda. Crie o primeiro abaixo e publique o link em suas landing pages.
+          <div className="card">
+            <EmptyState
+              title="Nenhum formulário ainda"
+              text="Crie o primeiro abaixo e publique o link ou o embed nas suas landing pages — cada envio vira um lead no funil."
+              actionHref="#novo-formulario"
+              actionLabel="Criar formulário"
+            />
           </div>
         )}
         {rows.map(({ form, submissions }) => (
@@ -72,7 +78,7 @@ export default async function FormsPage() {
         ))}
       </div>
 
-      <div className="card p-5">
+      <div id="novo-formulario" className="card p-5">
         <h2 className="mb-4 font-semibold">Novo formulário</h2>
         <FormBuilder action={saveFormAction} />
       </div>
